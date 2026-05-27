@@ -1,0 +1,40 @@
+name: ますみのこえ 自動テスト
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_count:
+        description: 'テスト回数'
+        required: true
+        default: '100'
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリを取得
+        uses: actions/checkout@v3
+
+      - name: Node.jsをセットアップ
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Playwrightをインストール
+        run: |
+          npm install playwright
+          npx playwright install chromium
+
+      - name: テスト実行
+        run: node masumi_test_simple.js
+        env:
+          TEST_COUNT: ${{ github.event.inputs.test_count || '100' }}
+
+      - name: テスト結果をアップロード
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results
+          path: test_results.json
