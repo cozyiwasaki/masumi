@@ -10,7 +10,7 @@
 <style>
 :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1a2236;--accent:#e85d8a;--accent2:#7c6ff7;--teal:#2dd4bf;--white:#f0f4ff;--gray:#8892aa;--border:rgba(240,244,255,0.08);--shadow:0 8px 32px rgba(0,0,0,0.4);--glow:0 0 40px rgba(232,93,138,0.3)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow-x:hidden;overflow-y:auto}
 body::before{content:'';position:fixed;top:-200px;right:-200px;width:500px;height:500px;background:radial-gradient(circle,rgba(124,111,247,0.12) 0%,transparent 70%);pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:400px;height:400px;background:radial-gradient(circle,rgba(232,93,138,0.1) 0%,transparent 70%);pointer-events:none;z-index:0}
 .header{background:rgba(10,14,26,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
@@ -24,7 +24,7 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:400px;heig
 .tab{flex:1;padding:12px 4px;text-align:center;font-size:10px;color:var(--gray);cursor:pointer;border:none;background:none;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:4px}
 .tab .ti{font-size:20px}
 .tab.active{color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-1px}
-.content{flex:1;overflow-y:auto;padding:20px 16px 100px;position:relative;z-index:1}
+.content{flex:1;overflow-y:auto;padding:20px 16px 100px;position:relative;z-index:1;height:calc(100vh - 120px)}
 .page{display:none}.page.active{display:block}
 .status-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
 .sdot{width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);flex-shrink:0}
