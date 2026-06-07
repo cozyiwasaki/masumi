@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -8,499 +7,1496 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ますみのこえ">
 <meta name="theme-color" content="#E85555">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23E85555'/%3E%3Ctext x='90' y='115' font-size='90' text-anchor='middle'%3E🌸%3C/text%3E%3C/svg%3E">
 <title>ますみのこえ</title>
 <style>
-:root{--pink:#E85555;--pink-light:#FFE8E8;--pink-mid:#F9A8A8;--white:#FFFFFF;--gray:#666;--shadow:0 2px 12px rgba(232,85,85,0.15)}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--pink-light);color:#333;max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-/* ヘッダー */
-.header{background:var(--pink);color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);position:sticky;top:0;z-index:100}
-.header h1{font-size:18px;font-weight:700}
-.header-right{display:flex;align-items:center;gap:8px}
-.status-indicator{width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80}
-.status-indicator.loading{background:#fbbf24;animation:blink 0.8s infinite}
-.status-indicator.error{background:#f87171}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-/* タブ */
-.tabs{display:flex;background:white;border-bottom:2px solid var(--pink-light);position:sticky;top:52px;z-index:99}
-.tab{flex:1;padding:10px 4px;text-align:center;font-size:11px;color:var(--gray);cursor:pointer;border:none;background:none;transition:all 0.2s}
-.tab.active{color:var(--pink);border-bottom:2px solid var(--pink);margin-bottom:-2px;font-weight:700}
-.tab-icon{display:block;font-size:20px;margin-bottom:2px}
-/* コンテンツ */
-.content{flex:1;overflow-y:auto;padding:16px;padding-bottom:80px}
-.page{display:none}.page.active{display:block}
-/* ホーム */
-.phrase-categories{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.phrase-cat{background:white;border-radius:14px;padding:14px;cursor:pointer;box-shadow:var(--shadow);text-align:center;border:none;transition:transform 0.15s}
-.phrase-cat:active{transform:scale(0.97)}
-.phrase-cat-icon{font-size:28px;display:block;margin-bottom:6px}
-.phrase-cat-name{font-size:12px;font-weight:600;color:#444}
-.phrase-cat-count{font-size:10px;color:var(--gray);margin-top:2px}
-/* モーダル */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;justify-content:flex-end;flex-direction:column}
-.modal-overlay.open{display:flex}
-.modal{background:white;border-radius:20px 20px 0 0;max-height:70vh;overflow-y:auto;padding:20px}
-.modal-title{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--pink)}
-.phrase-item{padding:12px 14px;margin-bottom:8px;background:var(--pink-light);border-radius:10px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:8px;transition:background 0.15s}
-.phrase-item:active{background:var(--pink-mid)}
-.modal-close{width:100%;padding:12px;background:#eee;border:none;border-radius:10px;margin-top:10px;font-size:14px;cursor:pointer}
-/* TTS */
-.tts-area{background:white;border-radius:16px;padding:16px;box-shadow:var(--shadow)}
-.tts-textarea{width:100%;min-height:100px;border:2px solid var(--pink-light);border-radius:10px;padding:12px;font-size:16px;font-family:inherit;resize:none;outline:none;transition:border-color 0.2s}
-.tts-textarea:focus{border-color:var(--pink)}
-.char-count{text-align:right;font-size:11px;color:var(--gray);margin-top:4px}
-.speed-control{margin:12px 0}
-.speed-label{font-size:12px;color:var(--gray);margin-bottom:6px;display:flex;justify-content:space-between}
-.speed-slider{width:100%;accent-color:var(--pink)}
-/* 話すボタン */
-.speak-btn{width:100%;padding:16px;background:var(--pink);color:white;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;margin-top:12px;transition:all 0.2s;position:relative;display:flex;align-items:center;justify-content:center;gap:10px}
-.speak-btn:disabled{opacity:0.6;cursor:not-allowed}
-.speak-btn.loading{background:#f59e0b}
-.speak-btn.success{background:#10b981}
-.speak-btn.error-state{background:#ef4444}
-/* ローディングスピナー */
-.spinner{width:20px;height:20px;border:3px solid rgba(255,255,255,0.3);border-top:3px solid white;border-radius:50%;animation:spin 0.8s linear infinite;display:none}
-.spinner.show{display:block}
-@keyframes spin{to{transform:rotate(360deg)}}
-/* エラーメッセージ */
-.error-msg{background:#FEE2E2;border:1px solid #FCA5A5;border-radius:10px;padding:12px;margin-top:10px;font-size:13px;color:#991B1B;display:none}
-.error-msg.show{display:block}
-.error-msg-title{font-weight:700;margin-bottom:4px}
-.retry-btn{background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;margin-top:8px}
-/* 成功トースト */
-.success-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#10b981;color:white;padding:10px 20px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
-.success-toast.show{opacity:1}
-/* 進捗表示 */
-.progress-bar{height:4px;background:var(--pink-light);border-radius:2px;overflow:hidden;margin-top:8px;display:none}
-.progress-bar.show{display:block}
-.progress-fill{height:100%;background:var(--pink);width:0%;transition:width 0.3s;border-radius:2px}
-/* 履歴 */
-.history-section{margin-top:16px}
-.section-title{font-size:13px;color:var(--gray);margin-bottom:8px;font-weight:600}
-.history-item{padding:10px 12px;background:white;border-radius:8px;margin-bottom:6px;font-size:13px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.08);display:flex;justify-content:space-between;align-items:center;transition:background 0.15s}
-.history-item:active{background:var(--pink-light)}
-/* 筆談ボード */
-.whiteboard-wrap{background:white;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
-#canvas{display:block;width:100%;touch-action:none;cursor:crosshair}
-.wb-controls{padding:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.wb-colors{display:flex;gap:6px}
-.wb-color{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:border-color 0.15s}
-.wb-color.active{border-color:#333}
-.wb-sizes{display:flex;gap:6px}
-.wb-size{width:28px;height:28px;background:#eee;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid transparent}
-.wb-size.active{border-color:var(--pink);background:var(--pink-light)}
-.wb-btn{padding:6px 12px;background:#eee;border:none;border-radius:8px;font-size:12px;cursor:pointer}
-/* リアクション */
-.reactions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.reaction-btn{background:white;border:none;border-radius:14px;padding:16px 8px;cursor:pointer;box-shadow:var(--shadow);transition:transform 0.15s;text-align:center}
-.reaction-btn:active{transform:scale(0.95)}
-.reaction-emoji{font-size:36px;display:block;margin-bottom:6px}
-.reaction-label{font-size:11px;color:#555}
-/* ネットワーク警告 */
-.network-warning{background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#92400E;display:none}
-.network-warning.show{display:block}
-/* ステータスバー */
-.status-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:white;border-top:1px solid #eee;padding:8px 16px;font-size:12px;color:var(--gray);text-align:center;z-index:98;transition:color 0.3s}
-.status-bar.speaking{color:var(--pink);font-weight:600}
-.status-bar.err{color:#ef4444;font-weight:600}
-/* トースト */
-.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,"Hiragino Sans",sans-serif;background:#FFF5F3;color:#2D1A1A;min-height:100vh;overscroll-behavior:none;}
+
+/* ── TOP BAR ── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:99;
+  background:rgba(255,245,243,0.97);
+  border-bottom:1.5px solid #FFD5CC;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:max(14px,env(safe-area-inset-top)) 16px 10px;
+  min-height:50px;
+}
+#appTitle{font-size:18px;font-weight:800;color:#E85555;display:flex;align-items:center;gap:6px;}
+#backBtn{display:none;background:none;border:none;font-size:15px;font-weight:700;color:#E85555;cursor:pointer;font-family:inherit;padding:4px 8px;border-radius:8px;}
+#topRight{display:flex;align-items:center;gap:8px;}
+#loadBtn{background:#E85555;color:white;border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+#loadBtn.loaded{background:#C04040;}
+#fileLoaded{font-size:12px;color:#AA7070;display:none;}
+
+#main{
+  padding-top:calc(max(14px,env(safe-area-inset-top)) + 50px);
+  padding-bottom:calc(72px + env(safe-area-inset-bottom));
+}
+
+/* ── BOTTOM NAV ── */
+#bottomNav{
+  position:fixed;bottom:0;left:0;right:0;z-index:98;
+  background:rgba(255,245,243,0.97);
+  border-top:1.5px solid #FFD5CC;
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
+  padding:4px 0 calc(4px + env(safe-area-inset-bottom));
+}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:1px;background:none;border:none;cursor:pointer;font-family:inherit;padding:5px 0;}
+.nav-ic{font-size:22px;}
+.nav-lb{font-size:10px;font-weight:700;color:#CCAAAA;}
+.nav-btn.active .nav-lb{color:#E85555;}
+.nav-btn.active .nav-ic{transform:scale(1.08);}
+
+/* ── ホーム画面 ── */
+#homeScreen{display:block;}
+.home-pad{padding:14px 14px 0;}
+
+.home-section-title{
+  font-size:12px;font-weight:700;color:#AA7070;
+  letter-spacing:0.8px;margin:14px 0 8px;
+  text-transform:uppercase;
+}
+
+/* カテゴリグリッド */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;}
+.cat-card{
+  background:white;border-radius:18px;
+  border:2px solid #FFD5CC;
+  padding:18px 10px;text-align:center;
+  cursor:pointer;
+  box-shadow:0 2px 10px rgba(232,85,85,0.06);
+  transition:transform 0.1s;
+  position:relative;overflow:hidden;
+}
+.cat-card:active{transform:scale(0.96);}
+.cat-card .badge{
+  position:absolute;top:8px;right:8px;
+  background:#E85555;color:white;
+  font-size:10px;font-weight:700;
+  border-radius:10px;padding:2px 7px;
+  display:none;
+}
+.cat-card.has-files .badge{display:block;}
+.cat-emoji{font-size:38px;margin-bottom:6px;}
+.cat-name{font-size:15px;font-weight:700;color:#2D1A1A;}
+.cat-sub{font-size:11px;color:#AA7070;margin-top:3px;}
+
+/* 特別カード（筆談・読み上げ） */
+.cat-card.special{
+  background:linear-gradient(135deg,#E85555,#FF7A7A);
+  border-color:#E85555;
+}
+.cat-card.special .cat-name{color:white;}
+.cat-card.special .cat-sub{color:rgba(255,255,255,0.8);}
+
+/* ── フレーズ画面 ── */
+#phraseScreen{display:none;}
+.phrase-pad{padding:12px 14px 0;}
+#phraseSearch{
+  width:100%;padding:11px 14px;
+  border:1.5px solid #FFE0DC;border-radius:14px;
+  font-size:16px;font-family:inherit;background:white;
+  outline:none;margin-bottom:12px;
+}
+#phraseSearch:focus{border-color:#E85555;}
+.phrase-grid{display:flex;flex-direction:column;gap:8px;}
+.phrase-btn{
+  width:100%;background:white;
+  border:1.5px solid #FFE0DC;border-radius:14px;
+  padding:14px 56px 14px 16px;
+  font-size:16px;font-weight:500;text-align:left;
+  cursor:pointer;font-family:inherit;position:relative;
+  line-height:1.4;color:#2D1A1A;
+}
+.phrase-btn:active{background:#FFF5F3;}
+.phrase-btn.playing{border-color:#E85555;background:#FFF5F3;}
+.play-ic{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:36px;height:36px;border-radius:50%;
+  background:#E85555;color:white;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.play-ic.on{background:#FF8A80;animation:pulse 0.7s ease infinite alternate;}
+@keyframes pulse{from{transform:translateY(-50%) scale(1);}to{transform:translateY(-50%) scale(1.15);}}
+.tts-badge{
+  font-size:10px;background:#FFF0F0;color:#E85555;
+  border:1px solid #FFD5CC;border-radius:6px;
+  padding:1px 5px;margin-left:6px;vertical-align:middle;
+}
+
+/* ── TTS画面 ── */
+#ttsScreen{display:none;}
+.tts-pad{padding:14px 14px 0;}
+.card{background:white;border-radius:18px;border:1.5px solid #FFD5CC;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(232,85,85,0.05);}
+.card-title{font-size:12px;font-weight:700;color:#AA7070;letter-spacing:0.5px;margin-bottom:10px;}
+#ttsInput{
+  width:100%;min-height:100px;padding:11px;
+  border:1.5px solid #FFE0DC;border-radius:12px;
+  font-size:17px;font-family:inherit;line-height:1.7;
+  background:#FFFAFA;outline:none;resize:none;color:#2D1A1A;
+}
+#ttsInput:focus{border-color:#E85555;background:white;}
+#ttsInput::placeholder{color:#CCAAAA;}
+#ttsCharCount{text-align:right;font-size:12px;color:#CCAAAA;margin-top:4px;}
+.speed-row{display:flex;align-items:center;gap:8px;}
+.speed-row span{font-size:12px;color:#AA7070;}
+#spSlider{flex:1;accent-color:#E85555;}
+#speedVal{font-size:13px;font-weight:700;color:#E85555;text-align:center;margin-top:4px;}
+#ttsSpeakBtn{
+  width:100%;padding:17px;margin-bottom:12px;
+  background:linear-gradient(135deg,#E85555,#FF7A7A);
+  color:white;border:none;border-radius:16px;
+  font-size:19px;font-weight:800;font-family:inherit;cursor:pointer;
+  box-shadow:0 5px 18px rgba(232,85,85,0.35);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+#ttsSpeakBtn:active{opacity:0.85;}
+#ttsSpeakBtn:disabled{background:#FFAAAA;box-shadow:none;}
+#ttsStatusBox{
+  display:none;align-items:center;gap:10px;
+  background:white;border-radius:12px;border:1.5px solid #FFE0DC;
+  padding:11px 14px;margin-bottom:12px;
+}
+#ttsStatusBox.show{display:flex;}
+#ttsProgress{height:3px;background:#FFE0DC;border-radius:2px;overflow:hidden;margin-bottom:12px;display:none;}
+#ttsProgressFill{height:100%;background:#E85555;animation:tprog 1.5s ease infinite;}
+@keyframes tprog{0%{width:0%;margin-left:0%;}50%{width:60%;margin-left:20%;}100%{width:0%;margin-left:100%;}}
+.quick-wrap{display:flex;flex-wrap:wrap;gap:7px;}
+.quick-btn{background:#FFF5F3;border:1.5px solid #FFD5CC;border-radius:18px;padding:7px 13px;font-size:14px;font-weight:600;color:#E85555;cursor:pointer;font-family:inherit;}
+.quick-btn:active{background:#FFE8E4;}
+.hist-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #FFF0EE;cursor:pointer;}
+.hist-row:last-child{border-bottom:none;}
+.hist-txt{font-size:15px;font-weight:500;flex:1;line-height:1.4;}
+.hist-ic{width:32px;height:32px;border-radius:50%;background:#E85555;color:white;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.hist-ic.on{background:#FF8A80;animation:pulse2 0.7s ease infinite alternate;}
+@keyframes pulse2{from{transform:scale(1);}to{transform:scale(1.15);}}
+
+/* TTS内手書き */
+#hwCanvasWrap{border:2px dashed #FFD5CC;border-radius:12px;background:#FFFAFA;overflow:hidden;touch-action:none;}
+#hwCanvas{display:block;width:100%;cursor:crosshair;}
+.hw-toolbar{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.hw-col{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;flex-shrink:0;}
+.hw-col.active{border-color:#E85555;}
+.hw-tool{background:#FFF5F3;border:1.5px solid #FFD5CC;border-radius:16px;padding:6px 12px;font-size:12px;font-weight:600;color:#E85555;cursor:pointer;font-family:inherit;}
+.hw-tool:active{background:#FFE8E4;}
+#hwReadBtn{flex:1;background:linear-gradient(135deg,#E85555,#FF7A7A);color:white;border:none;border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px;}
+#hwReadBtn:disabled{background:#FFAAAA;}
+#hwStatus{font-size:12px;color:#AA7070;margin-top:5px;text-align:center;min-height:15px;}
+
+/* ── 筆談画面（全画面固定） ── */
+#hdCanvas{
+  position:fixed;top:0;left:0;
+  width:100vw !important;height:100vh !important;
+  z-index:200;background:white;
+  touch-action:none;-webkit-user-select:none;user-select:none;
+  display:none;cursor:crosshair;
+}
+#hdCanvas.show{display:block;}
+#hdTopBar{
+  position:fixed;top:0;left:0;right:0;z-index:210;
+  display:none;align-items:center;justify-content:space-between;
+  padding:max(12px,env(safe-area-inset-top)) 14px 8px;
+  background:rgba(255,255,255,0.93);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid #eee;min-height:48px;
+}
+#hdTopBar.show{display:flex;}
+#hdTopBar h2{font-size:16px;font-weight:700;color:#2D1A1A;}
+.hd-act{width:40px;height:40px;border-radius:10px;border:none;background:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.hd-act:active{background:rgba(0,0,0,0.07);}
+#hdBottomBar{
+  position:fixed;bottom:0;left:0;right:0;z-index:210;
+  display:none;align-items:center;gap:10px;
+  padding:8px 14px calc(8px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,0.93);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-top:1px solid #eee;
+}
+#hdBottomBar.show{display:flex;}
+.hd-col{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;flex-shrink:0;}
+.hd-col.active{border-color:#E85555;box-shadow:0 0 0 2px #E85555;}
+#hdSizeSlider{flex:1;accent-color:#2D1A1A;}
+#hdEraserBtn{padding:7px 13px;border-radius:18px;border:1.5px solid #ddd;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:white;color:#666;white-space:nowrap;}
+
+/* ── ELモード ── */
+#elScreen{display:none;}
+.el-pad{padding:14px 14px 0;}
+#elDisplay{
+  background:white;border-radius:20px;
+  border:2px solid #FFD5CC;
+  padding:24px 20px;margin-bottom:14px;
+  min-height:160px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(232,85,85,0.08);
+  position:relative;
+}
+#elDisplayText{
+  font-size:28px;font-weight:700;color:#2D1A1A;
+  text-align:center;line-height:1.6;word-break:break-all;width:100%;
+}
+#elDisplayText.empty{font-size:15px;color:#CCAAAA;font-weight:400;}
+#elListening{
+  position:absolute;top:10px;right:12px;
+  font-size:12px;font-weight:700;color:#E85555;
+  display:none;align-items:center;gap:4px;
+}
+#elListening.on{display:flex;}
+.el-dot{width:8px;height:8px;border-radius:50%;background:#E85555;animation:eldot 1s ease infinite alternate;}
+@keyframes eldot{from{opacity:0.3;}to{opacity:1;}}
+
+#elMicBtn{
+  width:100%;padding:22px;margin-bottom:12px;
+  background:linear-gradient(135deg,#E85555,#FF7A7A);
+  color:white;border:none;border-radius:20px;
+  font-size:20px;font-weight:800;font-family:inherit;cursor:pointer;
+  box-shadow:0 6px 24px rgba(232,85,85,0.4);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform 0.1s;
+}
+#elMicBtn:active{transform:scale(0.97);}
+#elMicBtn.listening{
+  background:linear-gradient(135deg,#CC2222,#EE4444);
+  animation:micpulse 1s ease infinite alternate;
+}
+@keyframes micpulse{from{box-shadow:0 6px 24px rgba(232,85,85,0.4);}to{box-shadow:0 6px 40px rgba(232,85,85,0.8);}}
+
+#elSpeakBtn{
+  width:100%;padding:16px;margin-bottom:12px;
+  background:white;color:#E85555;
+  border:2px solid #E85555;border-radius:16px;
+  font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+#elSpeakBtn:active{background:#FFF5F3;}
+#elSpeakBtn:disabled{opacity:0.4;}
+
+#elClearBtn{
+  width:100%;padding:12px;margin-bottom:14px;
+  background:white;color:#AA7070;
+  border:1.5px solid #FFD5CC;border-radius:14px;
+  font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;
+}
+#elStatus{
+  text-align:center;font-size:14px;color:#AA7070;
+  margin-bottom:12px;min-height:20px;
+}
+.el-hist-item{
+  background:white;border-radius:14px;border:1.5px solid #FFE0DC;
+  padding:12px 48px 12px 14px;margin-bottom:8px;
+  font-size:16px;font-weight:500;color:#2D1A1A;
+  cursor:pointer;position:relative;line-height:1.5;
+}
+.el-hist-item:active{background:#FFF5F3;}
+.el-hist-play{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:32px;height:32px;border-radius:50%;
+  background:#E85555;color:white;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.el-hist-play.on{background:#FF8A80;animation:pulse2 0.7s ease infinite alternate;}
+
+
+/* ── リアクション画面 ── */
+#reactionScreen{display:none;}
+.reaction-pad{
+  padding:8px 8px 0;
+}
+.reaction-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-bottom:8px;
+}
+.rx-btn{
+  background:white;
+  border:1.5px solid #FFD5CC;
+  border-radius:14px;
+  padding:6px 4px;
+  cursor:pointer;
+  font-family:inherit;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  min-height:70px;
+  transition:transform 0.1s;
+  box-shadow:0 2px 6px rgba(232,85,85,0.06);
+  position:relative;
+  overflow:hidden;
+}
+.rx-btn:active{
+  transform:scale(0.93);
+  background:#FFF5F3;
+  border-color:#E85555;
+}
+.rx-btn.playing{
+  background:#FFF0F0;
+  border-color:#E85555;
+}
+.rx-ic{font-size:26px;line-height:1;}
+.rx-lb{font-size:11px;font-weight:700;color:#2D1A1A;text-align:center;line-height:1.2;}
+.rx-btn.playing .rx-lb{color:#E85555;}
+
 </style>
 </head>
 <body>
+<audio id="unlocker" playsinline webkit-playsinline
+  src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//tQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQZB4P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"></audio>
+<input type="file" id="fileInput" multiple style="display:none">
 
-<div class="header">
-  <h1>ますみのこえ 🌸</h1>
-  <div class="header-right">
-    <div class="status-indicator" id="status-dot"></div>
+<!-- TOP BAR -->
+<div id="topbar">
+  <button id="backBtn" onclick="goBack()">◀ もどる</button>
+  <span id="appTitle">ますみのこえ 🌸</span>
+  <div id="topRight">
+    <span id="fileLoaded" style="font-size:12px;color:#AA7070;display:none;"></span>
+    <button id="loadBtn" onclick="triggerFile()" style="background:#E85555;color:white;border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">📂 音声読込</button>
   </div>
 </div>
 
-<div class="tabs">
-  <button class="tab active" onclick="showTab('home',this)"><span class="tab-icon">🏠</span>ホーム</button>
-  <button class="tab" onclick="showTab('tts',this)"><span class="tab-icon">🎙️</span>読み上げ</button>
-  <button class="tab" onclick="showTab('whiteboard',this)"><span class="tab-icon">🖊️</span>筆談</button>
-  <button class="tab" onclick="showTab('reactions',this)"><span class="tab-icon">💬</span>リアクション</button>
+<div id="main">
+
+<!-- ── ホーム画面 ── -->
+<div id="homeScreen">
+<div class="home-pad">
+  <div class="home-section-title">よく使う機能</div>
+  <div class="cat-grid"><div class="cat-card special" onclick="openSpecial('tts')" style="border:none;"><div class="cat-emoji">🎙️</div><div class="cat-name">音声読み上げ</div><div class="cat-sub">テキストをますみの声で</div></div><div class="cat-card special" onclick="openSpecial('hitsudan')" style="border:none;"><div class="cat-emoji">🖊️</div><div class="cat-name">筆談ボード</div><div class="cat-sub">手書きで伝える</div></div></div>
+  <div class="home-section-title">フレーズ集</div>
+  <div class="cat-grid"><div class="cat-card" id="card-kihon" onclick="openCat('kihon')"><div class="badge" id="badge-kihon">0</div><div class="cat-emoji">⭐</div><div class="cat-name">基本フレーズ</div><div class="cat-sub">ありがとう・ごめんなさい</div></div><div class="cat-card" id="card-nichijo" onclick="openCat('nichijo')"><div class="badge" id="badge-nichijo">0</div><div class="cat-emoji">🌞</div><div class="cat-name">日常会話</div><div class="cat-sub">毎日のあいさつ・気持ち</div></div><div class="cat-card" id="card-karada" onclick="openCat('karada')"><div class="badge" id="badge-karada">0</div><div class="cat-emoji">🏥</div><div class="cat-name">からだ・病院</div><div class="cat-sub">体調・痛み・医療</div></div><div class="cat-card" id="card-shopping" onclick="openCat('shopping')"><div class="badge" id="badge-shopping">0</div><div class="cat-emoji">🛍️</div><div class="cat-name">旅行・買い物</div><div class="cat-sub">お店・移動・注文</div></div><div class="cat-card" id="card-koechan" onclick="openCat('koechan')"><div class="badge" id="badge-koechan">0</div><div class="cat-emoji">💝</div><div class="cat-name">こーちゃん</div><div class="cat-sub">こーちゃんへの言葉</div></div><div class="cat-card" id="card-kotsu" onclick="openCat('kotsu')"><div class="badge" id="badge-kotsu">0</div><div class="cat-emoji">🚃</div><div class="cat-name">交通機関</div><div class="cat-sub">電車・バスの中で</div></div><div class="cat-card" id="card-other" onclick="openCat('other')"><div class="badge" id="badge-other">0</div><div class="cat-emoji">📁</div><div class="cat-name">その他</div><div class="cat-sub">読み込んだ音声</div></div></div>
+  <div style="height:8px;"></div>
+</div>
 </div>
 
-<div class="content">
+<!-- ── フレーズ画面 ── -->
+<div id="phraseScreen">
+<div class="phrase-pad">
+  <input type="text" id="phraseSearch" placeholder="🔍 ことばを検索..." oninput="renderPhrases()">
+  <div id="phraseList"></div>
+</div>
+</div>
 
-  <!-- ホーム -->
-  <div id="page-home" class="page active">
-    <div class="network-warning" id="network-warning">⚠️ インターネット接続が不安定です。声が出ない場合があります。</div>
-    <div class="phrase-categories" id="phrase-cats"></div>
+<!-- ── TTS画面 ── -->
+<div id="ttsScreen">
+<div class="tts-pad">
+
+  <div class="card">
+    <div class="card-title">💬 話したい言葉を入力</div>
+    <textarea id="ttsInput" placeholder="ここに入力してください&#10;例：ありがとう、大好きだよ" oninput="ttsOnInput()"></textarea>
+    <div id="ttsCharCount">0 文字</div>
   </div>
 
-  <!-- TTS -->
-  <div id="page-tts" class="page">
-    <div class="tts-area">
-      <textarea class="tts-textarea" id="tts-input" placeholder="話したい言葉を入力してください..." oninput="updateCount()"></textarea>
-      <div class="char-count"><span id="char-count">0</span> 文字</div>
-      <div class="speed-control">
-        <div class="speed-label"><span>🎚️ 話す速さ</span><span id="speed-val">標準 (1.0×)</span></div>
-        <input type="range" class="speed-slider" id="speed-slider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeed()">
-      </div>
-      <button class="speak-btn" id="speak-btn" onclick="speakText()">
-        <span class="spinner" id="spinner"></span>
-        <span id="speak-btn-text">🌸 話す</span>
-      </button>
-      <div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-      <div class="error-msg" id="error-msg">
-        <div class="error-msg-title" id="error-title">エラーが発生しました</div>
-        <div id="error-detail"></div>
-        <button class="retry-btn" onclick="retrySpeak()">🔄 もう一度試す</button>
-      </div>
+  <div class="card">
+    <div class="card-title">🎚️ 話す速さ</div>
+    <div class="speed-row">
+      <span>遅い</span>
+      <input type="range" id="spSlider" min="0.7" max="1.3" step="0.05" value="1.0" oninput="onSpeedChange()">
+      <span>速い</span>
     </div>
-    <div class="history-section">
-      <div class="section-title">🕐 最近話した言葉</div>
-      <div id="history-list"><div style="color:#aaa;font-size:13px;padding:8px">まだ履歴がありません</div></div>
-    </div>
+    <div id="speedVal">標準 (1.0×)</div>
   </div>
 
-  <!-- 筆談 -->
-  <div id="page-whiteboard" class="page">
-    <div class="whiteboard-wrap">
-      <canvas id="canvas"></canvas>
-      <div class="wb-controls">
-        <div class="wb-colors">
-          <div class="wb-color active" style="background:#333" data-color="#333" onclick="setColor(this)"></div>
-          <div class="wb-color" style="background:#E85555" data-color="#E85555" onclick="setColor(this)"></div>
-          <div class="wb-color" style="background:#4A90E2" data-color="#4A90E2" onclick="setColor(this)"></div>
-          <div class="wb-color" style="background:#27AE60" data-color="#27AE60" onclick="setColor(this)"></div>
-          <div class="wb-color" style="background:#F39C12" data-color="#F39C12" onclick="setColor(this)"></div>
-        </div>
-        <div class="wb-sizes">
-          <div class="wb-size" data-size="3" onclick="setSize(this)">S</div>
-          <div class="wb-size active" data-size="6" onclick="setSize(this)">M</div>
-          <div class="wb-size" data-size="12" onclick="setSize(this)">L</div>
-        </div>
-        <button class="wb-btn" style="background:#FFE0E0;color:#c00" onclick="clearCanvas()">🗑️ 消す</button>
-      </div>
-    </div>
+  <button id="ttsSpeakBtn" onclick="doTTS()">
+    <span id="ttsBtnIcon">🌸</span><span id="ttsBtnTxt">話す</span>
+  </button>
+
+  <div id="ttsStatusBox">
+    <span id="ttsStatusIcon">⏳</span>
+    <div><div id="ttsStatusText"></div><div id="ttsStatusSub" style="font-size:12px;color:#AA7070;margin-top:2px;"></div></div>
+  </div>
+  <div id="ttsProgress"><div id="ttsProgressFill"></div></div>
+
+  <div class="card">
+    <div class="card-title">⚡ よく使う言葉</div>
+    <div class="quick-wrap" id="quickWrap"></div>
   </div>
 
-  <!-- リアクション -->
-  <div id="page-reactions" class="page">
-    <div class="reactions-grid" id="reactions-grid"></div>
+
+  <div class="card">
+    <div class="card-title">🕐 最近話した言葉</div>
+    <div id="ttsHistList"><div style="color:#CCAAAA;font-size:14px;text-align:center;padding:8px 0;">まだ履歴がありません</div></div>
   </div>
 
 </div>
-
-<!-- フレーズモーダル -->
-<div class="modal-overlay" id="phrase-modal" onclick="if(event.target===this)closePhraseModal()">
-  <div class="modal">
-    <div class="modal-title" id="modal-title"></div>
-    <div id="modal-phrases"></div>
-    <button class="modal-close" onclick="closePhraseModal()">閉じる</button>
-  </div>
 </div>
 
-<div class="status-bar" id="status-bar">準備完了 🌸</div>
-<div class="toast" id="toast"></div>
+
+<!-- ── リアクション画面 ── -->
+<div id="reactionScreen">
+<div class="reaction-pad">
+<div class="reaction-grid" id="reactionGrid"></div>
+</div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ── EL音声モード ── -->
+<div id="elScreen">
+<div class="el-pad">
+
+  <!-- 認識結果表示 -->
+  <div id="elDisplay">
+    <div id="elDisplayText" class="empty">ELで話してください</div>
+    <div id="elListening"><div class="el-dot"></div>認識中...</div>
+  </div>
+
+  <!-- マイクボタン -->
+  <button id="elMicBtn" onclick="elToggleMic()">
+    <span id="elMicIcon">🎤</span>
+    <span id="elMicTxt">タップして話す</span>
+  </button>
+
+  <!-- 合成音声で読み上げ -->
+  <button id="elSpeakBtn" onclick="elSpeak()" disabled>
+    🌸 ますみの声で話す
+  </button>
+
+  <!-- クリア -->
+  <button id="elClearBtn" onclick="elClear()">🗑️ クリア</button>
+
+  <div id="elStatus"></div>
+
+  <!-- 履歴 -->
+  <div class="card">
+    <div class="card-title">🕐 最近の発話</div>
+    <div id="elHistList"><div style="color:#CCAAAA;font-size:14px;text-align:center;padding:8px 0;">まだ履歴がありません</div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bottomNav" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+  <button class="nav-btn active" id="navHome" onclick="switchTab('home')">
+    <span class="nav-ic">🏠</span><span class="nav-lb">ホーム</span>
+  </button>
+  <button class="nav-btn" id="navTTS" onclick="switchTab('tts')">
+    <span class="nav-ic">🎙️</span><span class="nav-lb">読み上げ</span>
+  </button>
+  <button class="nav-btn" id="navHD" onclick="switchTab('hitsudan')">
+    <span class="nav-ic">🖊️</span><span class="nav-lb">筆談</span>
+  </button>
+  <button class="nav-btn" id="navRX" onclick="switchTab('reaction')">
+    <span class="nav-ic">💬</span><span class="nav-lb">リアクション</span>
+  </button>
+</div>
+
+<!-- 筆談キャンバス（全画面fixed） -->
+<canvas id="hdCanvas"></canvas>
+<div id="hdTopBar">
+  <div style="display:flex;gap:4px;">
+    <button class="hd-act" onclick="switchTab('home')" title="ホームへ戻る" style="background:#FFF5F3;border:1.5px solid #FFD5CC;border-radius:12px;font-size:16px;font-weight:700;color:#E85555;padding:0 10px;width:auto;gap:4px;display:flex;align-items:center;">🏠 戻る</button>
+    <button class="hd-act" onclick="hdUndo()" title="元に戻す">↩️</button>
+  </div>
+  <h2>🖊️ 筆談ボード</h2>
+  <button class="hd-act" onclick="hdClearAll()" title="全消し">🗑️</button>
+</div>
+<div id="hdBottomBar">
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <div class="hd-col active" style="background:#1A1A1A;" onclick="hdSetCol('#1A1A1A',this)"></div>
+    <div class="hd-col" style="background:#E85555;" onclick="hdSetCol('#E85555',this)"></div>
+    <div class="hd-col" style="background:#2255CC;" onclick="hdSetCol('#2255CC',this)"></div>
+    <div class="hd-col" style="background:#22AA44;" onclick="hdSetCol('#22AA44',this)"></div>
+  </div>
+  <input type="range" id="hdSizeSlider" min="2" max="30" value="10" oninput="hdSz=parseInt(this.value)" style="flex:1;accent-color:#1A1A1A;">
+  <button id="hdEraserBtn" onclick="hdToggleEraser()">消しゴム</button>
+</div>
 
 <script>
-// ===== 設定 =====
-const VOICE_ID = 'WTQPCUFYlENCEyXVl4PU';
-const API_KEY  = 'sk_f623a27ecd3c189e2dec9ee82f806f0e52b6ab4b00ebadf5';
-const MAX_RETRIES = 3;
-const TIMEOUT_MS  = 20000;
+// ════════════════════════════════════════════
+//  設定
+// ════════════════════════════════════════════
+var TTS_API = 'sk_f623a27ecd3c189e2dec9ee82f806f0e52b6ab4b00ebadf5';
+var TTS_VID = 'WTQPCUFYlENCEyXVl4PU';
 
-// ===== データ =====
-const PHRASES = {
-  '⭐ 基本フレーズ':['ありがとう💕','ごめんなさい','はい','いいえ','もう一度お願い','わかった','わからない','大丈夫だよ','うれしい！','ちょっと待って'],
-  '🌞 日常会話':['おはよう☀️','おやすみ🌙','いってきます','ただいま','お腹すいた','のどが渇いた','眠い','疲れた','元気だよ','今日もよろしく'],
-  '🏥 からだ・病院':['痛い','ここが痛い','気持ち悪い','熱がある','薬をください','トイレに行きたい','休みたい','息苦しい','大丈夫じゃない','ゆっくり話して'],
-  '🛍️ 旅行・買い物':['これをください','いくらですか？','クレジットカードは使えますか？','どこですか？','ありがとうございました','もう少し安くなりますか？','試着したい'],
-  '💝 こーちゃん':['愛してるよ💕','そばにいてね','ありがとう、いつも','手を握って','声が聞きたかった','あなたがいれば大丈夫','いっしょにいよう','ずっと好きだよ🌸'],
-  '🚃 交通機関':['〇〇駅はどこですか？','次は何駅ですか？','乗り換えはありますか？','タクシーを呼んでください','ここで降ります'],
+// ── 組み込みフレーズ（ファイル不要） ──────────
+var BUILTIN = {
+  kihon: [
+    'ありがとう','どういたしまして','ごめんなさい','すみません',
+    'はい','いいえ','おねがいします','よろしくお願いします',
+    'わかりました','わかりません','もう一度お願いします',
+    'ゆっくり話してください','助けてください','大丈夫です'
+  ],
+  nichijo: [
+    'おはようございます','こんにちは','こんばんは','おやすみなさい',
+    'さようなら','またね','元気ですか','元気です','疲れました',
+    '嬉しいです','悲しいです','痛いです','眠いです','お腹が空きました',
+    'のどが渇きました','寒いです','暑いです','大好きです','そばにいてください'
+  ],
+  karada: [
+    '痛いです','頭が痛いです','お腹が痛いです','胸が痛いです',
+    '背中が痛いです','のどが痛いです','熱があります','気分が悪いです',
+    '吐き気がします','めまいがします','息苦しいです','咳が出ます',
+    '薬をください','病院に行きたいです','救急車を呼んでください'
+  ],
+  shopping: [
+    'これをください','いくらですか','高いですね','安いですね',
+    'これを見せてください','別のサイズはありますか','別の色はありますか',
+    'これにします','要りません','袋をください','カードで払います',
+    '現金で払います','領収書をください','どこにありますか','トイレはどこですか',
+    '駅はどこですか','タクシーを呼んでください'
+  ],
+  koechan: [
+    'こーちゃん、大好き','こーちゃん、ありがとう','こーちゃん天才',
+    'こーちゃんすごい','こーちゃん、愛してるよ','こーちゃん、そばにいて',
+    'こーちゃんのおかげで助かった','こーちゃんと一緒にいたい'
+  ],
+  kotsu: [
+    'おります','降ります','次で降ります','ここで降ります',
+    '気分が悪いです','席を譲ってください','座らせてください',
+    'すみません、通してください','荷物を持ってもらえますか',
+    '○○駅に止まりますか','終点はどこですか','乗り換えはどこですか',
+    'この電車は○○行きですか','バス停はどこですか','次のバスは何時ですか',
+    '運賃はいくらですか','ICカードは使えますか','切符をなくしました',
+    '具合が悪いので止めてください','緊急停車してください',
+    '車椅子スペースはありますか','ドアを開けてください',
+    '忘れ物をしました','この荷物を上に置いてもいいですか'
+  ]
 };
-const REACTIONS=[
-  {e:'😊',l:'うれしい'},{e:'😢',l:'かなしい'},{e:'😂',l:'おかしい'},
-  {e:'😍',l:'大好き'},{e:'😴',l:'ねむい'},{e:'😤',l:'いやだ'},
-  {e:'🥰',l:'ありがとう'},{e:'😣',l:'つらい'},{e:'🤔',l:'わからない'},
-  {e:'👍',l:'いいよ'},{e:'👋',l:'またね'},{e:'🆘',l:'助けて'},
+
+// ── 状態 ──────────────────────────────────
+var FILES    = {};
+var CAT_MAP  = {};
+var curTab   = 'home';
+var curCat   = null;
+var curPlay  = null;
+var curPlayBtn = null;
+var ttsHist  = [];
+var ttsAudio = null;
+var ttsHistBtn = null;
+var actx     = null;
+var sessionOK = false;
+var audioCache = {};
+
+// ── カテゴリ定義 ──────────────────────────
+var CATS = [
+  {id:'kihon',    keys:['ありがとう','どういたし','ごめん','すみません','はい','いいえ','おねがい','よろしく','わかり','もう一度','ゆっくり','たすけて','だいじょうぶ']},
+  {id:'nichijo',  keys:['おはよう','こんにちは','こんばんは','おやすみ','さようなら','またね','げんき','うれしい','かなしい','ねむい','つかれ','さびしい','こわい','あたたかい','さむい','あつい','だいすき']},
+  {id:'karada',   keys:['いたい','あたま','おなか','せなか','のど','むね','ねつ','きぶんわるい','はき','めまい','いき','せき','くすり','びょういん','きゅうきゅう']},
+  {id:'shopping', keys:['かいもの','ください','いくら','たかい','やすい','みせて','サイズ','いろ','ふくろ','カード','げんきん','レシート','どこ','トイレ','えき','タクシー']},
+  {id:'koechan',  keys:['こーちゃん','こうちゃん','こうじ']},
+  {id:'kotsu',    keys:['おります','降ります','のります','乗ります','えき','駅','バス','電車','でんしゃ','きっぷ','切符','のりかえ','乗換','ていりゅうじょ','停留所','うんちん','運賃','ざせき','座席','しゅうてん','終点']},
 ];
 
-let history = JSON.parse(localStorage.getItem('mk_history')||'[]');
-let speechRate = 1.0;
-let lastText = '';
-let audioCtx = null;
-
-// ===== 初期化 =====
-function init(){
-  // iPhone Safari AudioContext初期化（ユーザー操作が必要）
-  document.addEventListener('touchstart', initAudioContext, {once:true});
-  document.addEventListener('click', initAudioContext, {once:true});
-  buildPhraseCategories();
-  buildReactions();
-  initCanvas();
-  renderHistory();
-  checkNetwork();
-  window.addEventListener('online',  ()=>{ document.getElementById('network-warning').classList.remove('show'); setStatus('ネットワーク復旧 ✅'); });
-  window.addEventListener('offline', ()=>{ document.getElementById('network-warning').classList.add('show'); setStatus('オフライン ⚠️','err'); });
-}
-
-function initAudioContext(){
-  if(!audioCtx){
-    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  }
-  if(audioCtx.state==='suspended') audioCtx.resume();
-}
-
-function checkNetwork(){
-  if(!navigator.onLine) document.getElementById('network-warning').classList.add('show');
-}
-
-// ===== フレーズ =====
-function buildPhraseCategories(){
-  const grid=document.getElementById('phrase-cats');
-  Object.entries(PHRASES).forEach(([cat,phrases])=>{
-    const parts=cat.split(' ');
-    const btn=document.createElement('button');
-    btn.className='phrase-cat';
-    btn.innerHTML=`<span class="phrase-cat-icon">${parts[0]}</span><div class="phrase-cat-name">${parts.slice(1).join(' ')}</div><div class="phrase-cat-count">${phrases.length}フレーズ</div>`;
-    btn.onclick=()=>openPhraseModal(cat,phrases);
-    grid.appendChild(btn);
+// ── ファイル読み込み ──────────────────────
+var fi = document.getElementById('fileInput');
+fi.addEventListener('change', function(e){
+  var list = e.target.files;
+  if(!list || list.length === 0) return;
+  var lb = document.getElementById('loadBtn');
+  if(lb){ lb.textContent='💾 保存中...'; lb.disabled=true; }
+  var fileArray = Array.from(list);
+  // FILES に即時登録
+  fileArray.forEach(function(f){
+    FILES[f.name.replace(/\.[^.]+$/,'')] = f;
   });
-}
-
-function openPhraseModal(cat,phrases){
-  document.getElementById('modal-title').textContent=cat;
-  const c=document.getElementById('modal-phrases');
-  c.innerHTML='';
-  phrases.forEach(p=>{
-    const d=document.createElement('div');
-    d.className='phrase-item';
-    d.innerHTML=`<span>🔊</span><span>${p}</span>`;
-    d.onclick=()=>{ doSpeak(p); closePhraseModal(); };
-    c.appendChild(d);
-  });
-  document.getElementById('phrase-modal').classList.add('open');
-}
-function closePhraseModal(){ document.getElementById('phrase-modal').classList.remove('open'); }
-
-// ===== リアクション =====
-function buildReactions(){
-  const grid=document.getElementById('reactions-grid');
-  REACTIONS.forEach(r=>{
-    const btn=document.createElement('button');
-    btn.className='reaction-btn';
-    btn.innerHTML=`<span class="reaction-emoji">${r.e}</span><span class="reaction-label">${r.l}</span>`;
-    btn.onclick=()=>doSpeak(r.l);
-    grid.appendChild(btn);
-  });
-}
-
-// ===== TTS =====
-async function speakText(){
-  const text=document.getElementById('tts-input').value.trim();
-  if(!text){ showToast('テキストを入力してください'); return; }
-  lastText=text;
-  await doSpeak(text);
-}
-
-async function retrySpeak(){
-  if(lastText) await doSpeak(lastText);
-}
-
-async function doSpeak(text){
-  initAudioContext();
-  setBtnState('loading');
-  hideError();
-  setStatus('🎙️ 生成中...','speaking');
-  showProgress(10);
-
-  let lastError = null;
-  for(let attempt=1; attempt<=MAX_RETRIES; attempt++){
-    try{
-      if(attempt>1){
-        setStatus(`🔄 リトライ中... (${attempt}/${MAX_RETRIES})`,'speaking');
-        showProgress(attempt*15);
-        await sleep(800*(attempt-1));
-      }
-      const audioUrl = await fetchSpeech(text);
-      showProgress(80);
-      await playAudio(audioUrl);
-      showProgress(100);
-      setBtnState('success');
-      setStatus('✅ 再生完了');
-      addHistory(text);
-      setTimeout(()=>{ setBtnState('normal'); setStatus('準備完了 🌸'); hideProgress(); }, 1500);
-      return;
-    }catch(e){
-      lastError=e;
-      console.error(`Attempt ${attempt} failed:`, e);
-    }
-  }
-  // 全試行失敗
-  setBtnState('error');
-  showError(lastError);
-  setStatus('❌ エラー','err');
-  hideProgress();
-}
-
-async function fetchSpeech(text){
-  const controller = new AbortController();
-  const timeoutId = setTimeout(()=>controller.abort(), TIMEOUT_MS);
-  try{
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,{
-      method:'POST',
-      headers:{'xi-api-key':API_KEY,'Content-Type':'application/json'},
-      body:JSON.stringify({
-        text:text,
-        model_id:'eleven_multilingual_v2',
-        voice_settings:{stability:0.5,similarity_boost:0.75,style:0,use_speaker_boost:true}
-      }),
-      signal:controller.signal
+  fi.value='';
+  buildCatMap();
+  var total = Object.keys(FILES).length;
+  var fl = document.getElementById('fileLoaded');
+  if(fl){fl.style.display='inline'; fl.textContent='📁 '+total+'件（保存中）';}
+  if(lb){lb.textContent='📂 再読込'; lb.disabled=false; lb.style.background='#C04040';}
+  updateBadges();
+  // バックグラウンドでDBに保存
+  clearDB(function(){
+    saveFilesToDB(fileArray, function(){
+      if(fl) fl.textContent='📁 '+total+'件（保存済）';
     });
-    clearTimeout(timeoutId);
-    if(!res.ok){
-      const errData = await res.json().catch(()=>({}));
-      if(res.status===401) throw new Error('APIキーが無効です (401)');
-      if(res.status===429) throw new Error('利用制限に達しました。しばらく待ってください (429)');
-      if(res.status===500) throw new Error('ElevenLabsサーバーエラーです (500)');
-      throw new Error(errData.detail?.message || `エラー ${res.status}`);
+  });
+});
+
+function triggerFile(){ fi.click(); }
+
+function buildCatMap(){
+  CATS.forEach(function(cat){ CAT_MAP[cat.id]=[]; });
+  CAT_MAP['kotsu']=CAT_MAP['kotsu']||[];
+  CAT_MAP['other']=[];
+  Object.keys(FILES).forEach(function(name){
+    var lower=name.toLowerCase();
+    var matched=false;
+    for(var i=0;i<CATS.length;i++){
+      var cat=CATS[i];
+      for(var j=0;j<cat.keys.length;j++){
+        if(lower.includes(cat.keys[j])){
+          CAT_MAP[cat.id].push(name); matched=true; break;
+        }
+      }
+      if(matched) break;
     }
-    const blob = await res.blob();
-    return URL.createObjectURL(blob);
-  }catch(e){
-    clearTimeout(timeoutId);
-    if(e.name==='AbortError') throw new Error('タイムアウトしました（20秒）。ネットワークを確認してください。');
-    throw e;
+    if(!matched) CAT_MAP['other'].push(name);
+  });
+}
+
+function updateBadges(){
+  var ids=['kihon','nichijo','karada','shopping','koechan','kotsu','other'];
+  ids.forEach(function(id){
+    var n=(CAT_MAP[id]||[]).length;
+    var badge=document.getElementById('badge-'+id);
+    var card=document.getElementById('card-'+id);
+    if(badge&&card){
+      badge.textContent=n;
+      if(n>0){card.classList.add('has-files');}
+    }
+  });
+}
+
+// ── タブ・画面切り替え ───────────────────
+function switchTab(tab){
+  curTab=tab;
+  var isHD = tab==='hitsudan';
+
+  // 筆談はfixed canvas
+  var hdC=document.getElementById('hdCanvas');
+  var hdT=document.getElementById('hdTopBar');
+  var hdB=document.getElementById('hdBottomBar');
+  if(isHD){
+    hdC.classList.add('show'); hdT.classList.add('show'); hdB.classList.add('show');
+    document.body.style.overflow='hidden';
+    document.body.style.position='fixed';
+    document.body.style.width='100%';
+    setTimeout(initHdCanvas,50);
+  } else {
+    hdC.classList.remove('show'); hdT.classList.remove('show'); hdB.classList.remove('show');
+    document.body.style.overflow='';
+    document.body.style.position='';
+    document.body.style.width='';
+  }
+
+  document.getElementById('homeScreen').style.display      = tab==='home'?'block':'none';
+  document.getElementById('ttsScreen').style.display       = tab==='tts'?'block':'none';
+  document.getElementById('reactionScreen').style.display  = tab==='reaction'?'block':'none';
+  document.getElementById('phraseScreen').style.display    = 'none';
+  document.getElementById('backBtn').style.display         = 'none';
+  document.getElementById('appTitle').textContent          = tab==='reaction' ? 'リアクション' : 'ますみのこえ';
+  curCat=null;
+
+  ['navHome','navTTS','navHD','navRX'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.classList.remove('active');
+  });
+  if(tab==='home')     document.getElementById('navHome').classList.add('active');
+  if(tab==='tts')      document.getElementById('navTTS').classList.add('active');
+  if(tab==='hitsudan') document.getElementById('navHD').classList.add('active');
+  if(tab==='reaction'){ document.getElementById('navRX').classList.add('active'); setTimeout(initReactionGrid,50); }
+
+  if(tab==='tts') setTimeout(initHwCanvas,80);
+  window.scrollTo(0,0);
+}
+
+function openSpecial(type){
+  if(type==='tts')      switchTab('tts');
+  if(type==='hitsudan') switchTab('hitsudan');
+}
+
+function openCat(catId){
+  curCat=catId;
+  var names={kihon:'基本フレーズ',nichijo:'日常会話',karada:'からだ・病院',shopping:'旅行・買い物',koechan:'こーちゃん',kotsu:'交通機関',other:'その他'};
+  var emojis={kihon:'⭐',nichijo:'🌞',karada:'🏥',shopping:'🛍️',koechan:'💝',kotsu:'🚃',other:'📁'};
+  document.getElementById('appTitle').textContent=(emojis[catId]||'')+(names[catId]||catId);
+  document.getElementById('backBtn').style.display='inline-block';
+  document.getElementById('homeScreen').style.display='none';
+  document.getElementById('phraseScreen').style.display='block';
+  document.getElementById('phraseSearch').value='';
+  renderPhrases();
+  window.scrollTo(0,0);
+}
+
+function goBack(){
+  document.getElementById('phraseScreen').style.display='none';
+  document.getElementById('homeScreen').style.display='block';
+  document.getElementById('backBtn').style.display='none';
+  document.getElementById('appTitle').textContent='ますみのこえ 🌸';
+  curCat=null;
+  document.getElementById('navHome').classList.add('active');
+}
+
+// ── フレーズレンダリング ──────────────────
+function renderPhrases(){
+  var q=(document.getElementById('phraseSearch').value||'').toLowerCase();
+  var list=document.getElementById('phraseList');
+  list.innerHTML='';
+
+  // 組み込みフレーズ
+  var builtin=(BUILTIN[curCat]||[]);
+  // ファイルフレーズ
+  var fileNames=(CAT_MAP[curCat]||[]);
+
+  // 検索フィルタ
+  if(q){
+    builtin=builtin.filter(function(p){return p.toLowerCase().includes(q);});
+    fileNames=fileNames.filter(function(n){return n.toLowerCase().includes(q);});
+  }
+
+  // ファイル音声（優先）
+  fileNames.forEach(function(name){
+    var row=document.createElement('div');
+    row.className='phrase-btn';
+    var id='pic-'+encodeURIComponent(name);
+    row.innerHTML=name+'<div class="play-ic" id="'+id+'">▶</div>';
+    row.addEventListener('click',function(){ playFile(name); });
+    list.appendChild(row);
+  });
+
+  // 組み込みTTSフレーズ（ファイルにない場合のみ）
+  var fileSet={};
+  fileNames.forEach(function(n){ fileSet[n]=true; });
+  builtin.forEach(function(phrase){
+    // ファイルに同名あればスキップ
+    if(fileSet[phrase]) return;
+    var row=document.createElement('div');
+    row.className='phrase-btn';
+    var id='tpic-'+encodeURIComponent(phrase);
+    row.innerHTML=phrase+'<span class="tts-badge">AI声</span><div class="play-ic" id="'+id+'">▶</div>';
+    row.addEventListener('click',function(){ playTTSPhrase(phrase,id); });
+    list.appendChild(row);
+  });
+
+  if(list.children.length===0){
+    list.innerHTML='<div style="color:#CCAAAA;text-align:center;padding:20px;font-size:14px;">見つかりませんでした</div>';
   }
 }
 
-async function playAudio(url){
-  return new Promise((resolve,reject)=>{
-    const audio = new Audio(url);
-    // iPhone Safari対応
-    audio.setAttribute('playsinline','');
-    audio.setAttribute('webkit-playsinline','');
-    audio.onended = ()=>{ URL.revokeObjectURL(url); resolve(); };
-    audio.onerror = (e)=>{ URL.revokeObjectURL(url); reject(new Error('音声再生エラー。音量を確認してください。')); };
-    // AudioContextを使って再生（iOS Safari対応）
-    if(audioCtx && audioCtx.state==='running'){
-      const source = audioCtx.createMediaElementSource ? null : null;
+// ── ファイル音声再生 ──────────────────────
+function playFile(name){
+  unlockSession(function(){
+    var file=FILES[name]; if(!file) return;
+    stopCurrent();
+    if(audioCache[name]){ playBuf(audioCache[name],name); return; }
+    if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended') actx.resume();
+
+    // ボタンをローディング表示
+    var pic=document.getElementById('pic-'+encodeURIComponent(name));
+    if(pic){ pic.textContent='⏳'; }
+
+    if(file._fromGitHub){
+      // GitHubから取得
+      var xhr=new XMLHttpRequest();
+      xhr.open('GET', file._rawUrl, true);
+      xhr.responseType='arraybuffer';
+      xhr.onload=function(){
+        if(xhr.status===200){
+          actx.decodeAudioData(xhr.response.slice(0),function(buf){
+            audioCache[name]=buf; playBuf(buf,name);
+          },function(e){ console.log('decode err',e); if(pic) pic.textContent='▶'; });
+        } else { if(pic) pic.textContent='▶'; }
+      };
+      xhr.onerror=function(){ if(pic) pic.textContent='▶'; };
+      xhr.send();
+    } else if(file._fromDB){
+      actx.decodeAudioData(file._buf.slice(0),function(buf){
+        audioCache[name]=buf; playBuf(buf,name);
+      },function(e){ console.log('decode err',e); });
+    } else {
+      var fr=new FileReader();
+      fr.onload=function(e){
+        actx.decodeAudioData(e.target.result.slice(0),function(buf){
+          audioCache[name]=buf; playBuf(buf,name);
+        });
+      };
+      fr.readAsArrayBuffer(file);
     }
-    const playPromise = audio.play();
-    if(playPromise!==undefined){
-      playPromise.catch(e=>{
-        // 自動再生ブロック対応
-        if(e.name==='NotAllowedError'){
-          // ユーザーのタップを待って再生
-          document.addEventListener('touchend', ()=>audio.play(), {once:true});
-          document.addEventListener('click', ()=>audio.play(), {once:true});
-          showToast('画面をタップすると再生されます');
-          audio.onended = ()=>resolve();
+  });
+}
+function playBuf(buf,name){
+  var gain=actx.createGain(); gain.gain.value=1.0; gain.connect(actx.destination);
+  var src=actx.createBufferSource(); src.buffer=buf; src.connect(gain); src.start(0);
+  curPlay=src;
+  var pic=document.getElementById('pic-'+encodeURIComponent(name));
+  if(pic){ pic.classList.add('on'); pic.textContent='♪'; curPlayBtn=pic; }
+  src.onended=function(){ if(curPlayBtn){curPlayBtn.classList.remove('on');curPlayBtn.textContent='▶';} curPlay=null; curPlayBtn=null; };
+}
+function stopCurrent(){
+  if(curPlay){try{curPlay.stop();}catch(e){} curPlay=null;}
+  if(curPlayBtn){curPlayBtn.classList.remove('on');curPlayBtn.textContent='▶';curPlayBtn=null;}
+}
+
+// ── フレーズTTS再生 ───────────────────────
+function playTTSPhrase(phrase,picId){
+  var pic=document.getElementById(picId);
+  if(pic){ pic.textContent='⏳'; }
+  ttsCall(phrase, 1.0, function(decoded){
+    stopCurrent();
+    if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended') actx.resume();
+    var gain=actx.createGain(); gain.gain.value=1.0; gain.connect(actx.destination);
+    var src=actx.createBufferSource(); src.buffer=decoded; src.connect(gain); src.start(0);
+    curPlay=src;
+    if(pic){ pic.classList.add('on'); pic.textContent='♪'; curPlayBtn=pic; }
+    src.onended=function(){ if(curPlayBtn){curPlayBtn.classList.remove('on');curPlayBtn.textContent='▶';} curPlay=null; curPlayBtn=null; };
+  }, function(){
+    if(pic){ pic.textContent='▶'; }
+  });
+}
+
+// ── ElevenLabs APIコール ──────────────────
+function ttsCall(text, speed, onSuccess, onError){
+  // AudioContextを確実にユーザージェスチャー後に作成・再開
+  if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+  if(actx.state==='suspended') actx.resume();
+
+  var xhr=new XMLHttpRequest();
+  xhr.open('POST','https://api.elevenlabs.io/v1/text-to-speech/'+TTS_VID,true);
+  xhr.setRequestHeader('Content-Type','application/json');
+  xhr.setRequestHeader('xi-api-key',TTS_API);
+  xhr.responseType='arraybuffer';
+  xhr.onload=function(){
+    if(xhr.status>=200&&xhr.status<300){
+      if(actx.state==='suspended') actx.resume();
+      actx.decodeAudioData(xhr.response.slice(0), function(decoded){
+        onSuccess(decoded);
+      }, function(e){
+        console.log('decode error',e);
+        if(onError) onError('decode');
+      });
+    } else {
+      console.log('TTS HTTP error:', xhr.status);
+      if(onError) onError(xhr.status);
+    }
+  };
+  xhr.onerror=function(e){
+    console.log('TTS XHR error',e);
+    if(onError) onError('network');
+  };
+  xhr.send(JSON.stringify({
+    text:text,
+    model_id:'eleven_multilingual_v2',
+    voice_settings:{stability:0.5,similarity_boost:0.85,speed:speed||1.0}
+  }));
+}
+
+// ── TTS画面 ───────────────────────────────
+function ttsOnInput(){
+  document.getElementById('ttsCharCount').textContent=document.getElementById('ttsInput').value.length+' 文字';
+}
+function onSpeedChange(){
+  var v=parseFloat(document.getElementById('spSlider').value);
+  document.getElementById('speedVal').textContent=(v<0.85?'遅め':v>1.15?'速め':'標準')+' ('+v.toFixed(2)+'×)';
+}
+function doTTS(){
+  var text=document.getElementById('ttsInput').value.trim();
+  if(!text){ttsSetSt('⚠️','入力してください','');return;}
+  ttsSetLoading(true);
+  ttsSetSt('⏳','生成中...','ますみさんの声を作っています');
+  document.getElementById('ttsProgress').style.display='block';
+  var spd=parseFloat(document.getElementById('spSlider').value);
+  unlockSession(function(){
+    ttsCall(text, spd, function(decoded){
+      ttsSoundStop();
+      var gain=actx.createGain(); gain.gain.value=1.0; gain.connect(actx.destination);
+      var src=actx.createBufferSource(); src.buffer=decoded; src.connect(gain); src.start(0);
+      ttsAudio=src;
+      ttsSetSt('🎵','再生中...','');
+      document.getElementById('ttsProgress').style.display='none';
+      ttsSetLoading(false);
+      ttsAddHist(text,decoded);
+      src.onended=function(){ttsAudio=null;ttsClearSt();};
+    }, function(errCode){
+      var msg = errCode==='network' ? '通信エラー。インターネット接続を確認' :
+                errCode==='decode'  ? '音声デコードエラー' :
+                'エラー('+errCode+')。もう一度試してください';
+      ttsSetSt('❌', msg, '');
+      document.getElementById('ttsProgress').style.display='none';
+      ttsSetLoading(false);
+    });
+  });
+}
+function ttsSoundStop(){
+  if(ttsAudio){try{ttsAudio.stop();}catch(e){} ttsAudio=null;}
+  if(ttsHistBtn){ttsHistBtn.classList.remove('on');ttsHistBtn.textContent='▶';ttsHistBtn=null;}
+}
+function ttsSetLoading(on){
+  document.getElementById('ttsSpeakBtn').disabled=on;
+  document.getElementById('ttsBtnIcon').textContent=on?'⏳':'🌸';
+  document.getElementById('ttsBtnTxt').textContent=on?'生成中...':'話す';
+}
+function ttsSetSt(icon,text,sub){
+  document.getElementById('ttsStatusBox').className='show';
+  document.getElementById('ttsStatusIcon').textContent=icon;
+  document.getElementById('ttsStatusText').textContent=text;
+  document.getElementById('ttsStatusSub').textContent=sub;
+  if(icon==='⚠️'||icon==='❌') setTimeout(ttsClearSt,3000);
+}
+function ttsClearSt(){
+  document.getElementById('ttsStatusBox').className='';
+  document.getElementById('ttsProgress').style.display='none';
+}
+function ttsAddHist(text,decoded){
+  ttsHist=ttsHist.filter(function(h){return h.text!==text;});
+  ttsHist.unshift({text:text,decoded:decoded});
+  if(ttsHist.length>15) ttsHist.pop();
+  var c=document.getElementById('ttsHistList'); c.innerHTML='';
+  ttsHist.forEach(function(item){
+    var row=document.createElement('div'); row.className='hist-row';
+    var txt=document.createElement('span'); txt.className='hist-txt'; txt.textContent=item.text;
+    var ic=document.createElement('div'); ic.className='hist-ic'; ic.textContent='▶';
+    row.appendChild(txt); row.appendChild(ic);
+    row.addEventListener('click',function(){
+      document.getElementById('ttsInput').value=item.text; ttsOnInput();
+      ttsSoundStop();
+      if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+      if(actx.state==='suspended') actx.resume();
+      var gain=actx.createGain(); gain.gain.value=1.0; gain.connect(actx.destination);
+      var src=actx.createBufferSource(); src.buffer=item.decoded; src.connect(gain); src.start(0);
+      ttsAudio=src; ttsHistBtn=ic; ic.classList.add('on'); ic.textContent='♪';
+      src.onended=function(){ic.classList.remove('on');ic.textContent='▶';ttsAudio=null;ttsHistBtn=null;};
+    });
+    c.appendChild(row);
+  });
+}
+// クイックフレーズ
+(function(){
+  var qs=['ありがとう','大好き','おはよう','おやすみ','いたい','つかれた','うれしい','そばにいて'];
+  var w=document.getElementById('quickWrap');
+  qs.forEach(function(q){
+    var b=document.createElement('button'); b.className='quick-btn'; b.textContent=q;
+    b.addEventListener('click',function(){document.getElementById('ttsInput').value=q;ttsOnInput();doTTS();});
+    w.appendChild(b);
+  });
+})();
+
+// ── TTS内手書き ──────────────────────────
+var hwCol='#1A1A1A', hwSz=5, hwDrawing=false, hwHas=false, hwCtx=null;
+function initHwCanvas(){
+  var canvas=document.getElementById('hwCanvas');
+  var wrap=document.getElementById('hwCanvasWrap');
+  if(!canvas||!wrap) return;
+  var w=wrap.clientWidth; if(w<=0) return;
+  canvas.width=w; canvas.height=170;
+  if(!hwCtx){
+    hwCtx=canvas.getContext('2d');
+    function gp(e){var r=canvas.getBoundingClientRect();var t=e.touches?e.touches[0]:e;return{x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)};}
+    function sd(e){e.preventDefault();hwDrawing=true;hwHas=true;var p=gp(e);hwCtx.beginPath();hwCtx.moveTo(p.x,p.y);hwCtx.strokeStyle=hwCol;hwCtx.lineWidth=hwSz;hwCtx.lineCap='round';hwCtx.lineJoin='round';}
+    function md(e){e.preventDefault();if(!hwDrawing)return;var p=gp(e);hwCtx.lineTo(p.x,p.y);hwCtx.stroke();hwCtx.beginPath();hwCtx.moveTo(p.x,p.y);hwCtx.strokeStyle=hwCol;hwCtx.lineWidth=hwSz;}
+    function ed(e){e.preventDefault();hwDrawing=false;}
+    canvas.addEventListener('mousedown',sd);canvas.addEventListener('mousemove',md);canvas.addEventListener('mouseup',ed);
+    canvas.addEventListener('touchstart',sd,{passive:false});canvas.addEventListener('touchmove',md,{passive:false});canvas.addEventListener('touchend',ed,{passive:false});
+  }
+  hwCtx.lineCap='round';hwCtx.lineJoin='round';
+}
+window.hwSetCol=function(col,el){hwCol=col;document.querySelectorAll('#ttsScreen .hw-col').forEach(function(b){b.classList.remove('active');});el.classList.add('active');};
+window.hwClear=function(){if(hwCtx){var c=document.getElementById('hwCanvas');hwCtx.clearRect(0,0,c.width,c.height);}hwHas=false;document.getElementById('hwStatus').textContent='';};
+window.hwApiSet=function(){document.getElementById('hwApiWrap').style.display='none';hwRead();};
+window.hwRead=function(){
+  if(!hwHas){document.getElementById('hwStatus').textContent='⚠️ 文字を書いてください';return;}
+  var key=document.getElementById('hwApiKey')?document.getElementById('hwApiKey').value.trim():'';
+  if(!key){document.getElementById('hwStatus').textContent='⚠️ APIキーが必要です';document.getElementById('hwApiWrap').style.display='block';return;}
+  var btn=document.getElementById('hwReadBtn');btn.disabled=true;
+  document.getElementById('hwRI').textContent='⏳';document.getElementById('hwRT').textContent=' 読取中...';
+  var canvas=document.getElementById('hwCanvas');
+  var img=canvas.toDataURL('image/png').split(',')[1];
+  var xhr=new XMLHttpRequest();
+  xhr.open('POST','https://api.anthropic.com/v1/messages',true);
+  xhr.setRequestHeader('Content-Type','application/json');
+  xhr.setRequestHeader('x-api-key',key);
+  xhr.setRequestHeader('anthropic-version','2023-06-01');
+  xhr.setRequestHeader('anthropic-dangerous-direct-browser-access','true');
+  xhr.responseType='text';
+  xhr.onload=function(){
+    btn.disabled=false;document.getElementById('hwRI').textContent='🔍';document.getElementById('hwRT').textContent=' 読み取る';
+    if(xhr.status===200){
+      try{var res=JSON.parse(xhr.responseText);var txt=res.content[0].text.trim();var cur=document.getElementById('ttsInput').value;document.getElementById('ttsInput').value=cur+txt;ttsOnInput();document.getElementById('hwStatus').textContent='✅ '+txt;hwClear();}
+      catch(e){document.getElementById('hwStatus').textContent='❌ エラー';}
+    } else {document.getElementById('hwStatus').textContent='❌ エラー('+xhr.status+')';}
+  };
+  xhr.onerror=function(){btn.disabled=false;document.getElementById('hwRI').textContent='🔍';document.getElementById('hwRT').textContent=' 読み取る';document.getElementById('hwStatus').textContent='❌ 通信エラー';};
+  xhr.send(JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:200,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/png',data:img}},{type:'text',text:'手書きの日本語テキストを読み取りテキストのみ返してください。'}]}]}));
+};
+
+// ── 筆談（全画面キャンバス） ─────────────
+var hdCol='#1A1A1A', hdSz=10, hdDrawing=false, hdCtx=null, hdEraser=false, hdStrokes=[];
+function initHdCanvas(){
+  var canvas=document.getElementById('hdCanvas');
+  if(!canvas) return;
+  var w=window.innerWidth, h=window.innerHeight;
+  var saved=null;
+  if(hdCtx&&canvas.width>0&&canvas.height>0){try{saved=hdCtx.getImageData(0,0,canvas.width,canvas.height);}catch(e){}}
+  canvas.width=w; canvas.height=h;
+  if(saved&&hdCtx){try{hdCtx.putImageData(saved,0,0);}catch(e){}}
+  if(!hdCtx){
+    hdCtx=canvas.getContext('2d');
+    function gp(e){var t=e.touches?e.touches[0]:e;return{x:t.clientX,y:t.clientY};}
+    function sd(e){
+      e.preventDefault();e.stopPropagation();
+      hdDrawing=true;
+      var p=gp(e);
+      try{hdStrokes.push(hdCtx.getImageData(0,0,canvas.width,canvas.height));}catch(ex){}
+      if(hdStrokes.length>30) hdStrokes.shift();
+      hdCtx.beginPath();hdCtx.moveTo(p.x,p.y);
+      hdCtx.lineCap='round';hdCtx.lineJoin='round';
+      if(hdEraser){hdCtx.globalCompositeOperation='destination-out';hdCtx.lineWidth=hdSz*3;}
+      else{hdCtx.globalCompositeOperation='source-over';hdCtx.strokeStyle=hdCol;hdCtx.lineWidth=hdSz;}
+    }
+    function md(e){
+      e.preventDefault();e.stopPropagation();
+      if(!hdDrawing) return;
+      var p=gp(e);hdCtx.lineTo(p.x,p.y);hdCtx.stroke();
+      hdCtx.beginPath();hdCtx.moveTo(p.x,p.y);hdCtx.lineCap='round';hdCtx.lineJoin='round';
+    }
+    function ed(e){e.preventDefault();e.stopPropagation();hdDrawing=false;}
+    canvas.addEventListener('mousedown',sd,{passive:false});
+    canvas.addEventListener('mousemove',md,{passive:false});
+    canvas.addEventListener('mouseup',ed,{passive:false});
+    canvas.addEventListener('mouseleave',ed,{passive:false});
+    canvas.addEventListener('touchstart',sd,{passive:false});
+    canvas.addEventListener('touchmove',md,{passive:false});
+    canvas.addEventListener('touchend',ed,{passive:false});
+    canvas.addEventListener('touchcancel',ed,{passive:false});
+  }
+  hdCtx.lineCap='round';hdCtx.lineJoin='round';
+}
+window.hdSetCol=function(col,el){hdCol=col;hdEraser=false;document.querySelectorAll('.hd-col').forEach(function(b){b.classList.remove('active');});el.classList.add('active');document.getElementById('hdEraserBtn').style.cssText='padding:7px 13px;border-radius:18px;border:1.5px solid #ddd;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:white;color:#666;white-space:nowrap;';};
+window.hdToggleEraser=function(){hdEraser=!hdEraser;var btn=document.getElementById('hdEraserBtn');if(hdEraser){btn.style.background='#2D1A1A';btn.style.color='white';}else{btn.style.background='white';btn.style.color='#666';}};
+window.hdUndo=function(){if(!hdCtx||hdStrokes.length===0)return;var prev=hdStrokes.pop();hdCtx.putImageData(prev,0,0);};
+window.hdClearAll=function(){if(!hdCtx)return;var c=document.getElementById('hdCanvas');try{hdStrokes.push(hdCtx.getImageData(0,0,c.width,c.height));}catch(e){}if(hdStrokes.length>30)hdStrokes.shift();hdCtx.clearRect(0,0,c.width,c.height);};
+
+// ── iOSセッション解放 ─────────────────────
+var unlocker=document.getElementById('unlocker');
+function unlockSession(cb){
+  if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+  if(sessionOK){if(actx.state==='suspended')actx.resume();cb();return;}
+  var p=unlocker.play();
+  var done=function(){unlocker.pause();unlocker.currentTime=0;if(actx.state==='suspended')actx.resume();sessionOK=true;cb();};
+  if(p){p.then(done).catch(done);}else{done();}
+}
+
+// リサイズ対応
+window.addEventListener('resize',function(){
+  if(curTab==='hitsudan'){clearTimeout(window._hdRT);window._hdRT=setTimeout(initHdCanvas,150);}
+  if(curTab==='tts') setTimeout(initHwCanvas,100);
+});
+
+
+// ════════════════════════════════════════════
+//  EL音声モード（音声認識→合成音声変換）
+// ════════════════════════════════════════════
+var elRecog  = null;
+var elActive = false;
+var elText   = '';
+var elHist   = [];
+var elAudio  = null;
+var elHistBtn = null;
+
+function elInit(){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    document.getElementById('elStatus').textContent =
+      '⚠️ このブラウザは音声認識に対応していません。Safariで開いてください。';
+    document.getElementById('elMicBtn').disabled = true;
+    return false;
+  }
+  elRecog = new SR();
+  elRecog.lang = 'ja-JP';
+  elRecog.continuous = true;
+  elRecog.interimResults = true;
+  elRecog.maxAlternatives = 3;
+
+  elRecog.onresult = function(e){
+    var interim = '';
+    var final   = '';
+    for(var i=e.resultIndex; i<e.results.length; i++){
+      var t = e.results[i][0].transcript;
+      if(e.results[i].isFinal){ final += t; }
+      else { interim += t; }
+    }
+    if(final){
+      elText = (elText + final).trim();
+      elUpdateDisplay(elText);
+      document.getElementById('elSpeakBtn').disabled = false;
+    } else if(interim){
+      elUpdateDisplay(elText + interim, true);
+    }
+  };
+
+  elRecog.onerror = function(e){
+    console.log('SR error:', e.error);
+    if(e.error === 'not-allowed'){
+      document.getElementById('elStatus').textContent = '⚠️ マイクの使用を許可してください';
+    } else if(e.error === 'no-speech'){
+      document.getElementById('elStatus').textContent = '声が聞こえませんでした。もう一度試してください。';
+    } else {
+      document.getElementById('elStatus').textContent = '認識エラー: ' + e.error;
+    }
+    elSetMicUI(false); elActive = false;
+  };
+
+  elRecog.onend = function(){
+    if(elActive){
+      // 継続認識のため再スタート
+      try{ elRecog.start(); } catch(e){ elActive=false; elSetMicUI(false); }
+    } else {
+      elSetMicUI(false);
+    }
+  };
+  return true;
+}
+
+function elUpdateDisplay(text, isInterim){
+  var el = document.getElementById('elDisplayText');
+  if(text){
+    el.textContent = text;
+    el.className = isInterim ? 'interim' : '';
+  } else {
+    el.textContent = 'ELで話してください';
+    el.className = 'empty';
+  }
+}
+
+window.elToggleMic = function(){
+  if(!elRecog){ if(!elInit()) return; }
+  if(elActive){
+    elActive = false;
+    try{ elRecog.stop(); } catch(e){}
+    elSetMicUI(false);
+    document.getElementById('elStatus').textContent = '停止しました';
+  } else {
+    elText = '';
+    elUpdateDisplay('');
+    document.getElementById('elSpeakBtn').disabled = true;
+    document.getElementById('elStatus').textContent = '';
+    elActive = true;
+    elSetMicUI(true);
+    try{ elRecog.start(); }
+    catch(e){
+      elActive = false; elSetMicUI(false);
+      document.getElementById('elStatus').textContent = '⚠️ マイクを起動できませんでした';
+    }
+  }
+};
+
+function elSetMicUI(isOn){
+  var btn = document.getElementById('elMicBtn');
+  var ic  = document.getElementById('elMicIcon');
+  var txt = document.getElementById('elMicTxt');
+  var ind = document.getElementById('elListening');
+  if(isOn){
+    btn.classList.add('listening');
+    ic.textContent  = '⏹️';
+    txt.textContent = '認識中... タップで停止';
+    ind.classList.add('on');
+  } else {
+    btn.classList.remove('listening');
+    ic.textContent  = '🎤';
+    txt.textContent = 'タップして話す';
+    ind.classList.remove('on');
+  }
+}
+
+window.elSpeak = function(){
+  if(!elText.trim()) return;
+  var text = elText.trim();
+  var btn  = document.getElementById('elSpeakBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 生成中...';
+  document.getElementById('elStatus').textContent = 'ますみさんの声を生成中...';
+
+  unlockSession(function(){
+    ttsCall(text, 1.0, function(decoded){
+      if(elAudio){ try{elAudio.stop();}catch(e){} elAudio=null; }
+      var gain=actx.createGain(); gain.gain.value=1.0; gain.connect(actx.destination);
+      var src=actx.createBufferSource(); src.buffer=decoded; src.connect(gain); src.start(0);
+      elAudio = src;
+      btn.textContent = '🌸 ますみの声で話す';
+      btn.disabled = false;
+      document.getElementById('elStatus').textContent = '🎵 再生中...';
+      elAddHist(text, decoded);
+      src.onended = function(){
+        elAudio = null;
+        document.getElementById('elStatus').textContent = '';
+      };
+    }, function(err){
+      btn.textContent = '🌸 ますみの声で話す';
+      btn.disabled = false;
+      document.getElementById('elStatus').textContent = '❌ エラーが発生しました';
+    });
+  });
+};
+
+window.elClear = function(){
+  elText = '';
+  elUpdateDisplay('');
+  document.getElementById('elSpeakBtn').disabled = true;
+  document.getElementById('elStatus').textContent = '';
+};
+
+function elAddHist(text, decoded){
+  elHist = elHist.filter(function(h){ return h.text !== text; });
+  elHist.unshift({text:text, decoded:decoded});
+  if(elHist.length > 10) elHist.pop();
+  var list = document.getElementById('elHistList');
+  list.innerHTML = '';
+  elHist.forEach(function(item){
+    var div = document.createElement('div');
+    div.className = 'el-hist-item';
+    var ic = document.createElement('div');
+    ic.className = 'el-hist-play'; ic.textContent = '▶';
+    div.textContent = item.text;
+    div.appendChild(ic);
+    div.addEventListener('click', function(){
+      if(elAudio){ try{elAudio.stop();}catch(e){} elAudio=null; }
+      if(elHistBtn){ elHistBtn.classList.remove('on'); elHistBtn.textContent='▶'; }
+      if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+      if(actx.state==='suspended') actx.resume();
+      var gain=actx.createGain(); gain.gain.value=1.0; gain.connect(actx.destination);
+      var src=actx.createBufferSource(); src.buffer=item.decoded; src.connect(gain); src.start(0);
+      elAudio=src; elHistBtn=ic;
+      ic.classList.add('on'); ic.textContent='♪';
+      src.onended=function(){ ic.classList.remove('on'); ic.textContent='▶'; elAudio=null; elHistBtn=null; };
+    });
+    list.appendChild(div);
+  });
+}
+
+// 初期表示
+switchTab('home');
+// 保存済み音声を自動読み込み
+autoLoadFromDB();
+
+
+// ════════════════════════════════════════════
+//  IndexedDB - 音声ファイルを端末に保存
+// ════════════════════════════════════════════
+var DB_NAME  = 'masumiVoiceDB_v2';
+var DB_VER   = 1;
+var DB_STORE = 'audioFiles';
+var idbRef   = null;
+var idbOK    = false; // IndexedDB使用可能フラグ
+
+function openDB(cb){
+  if(idbRef){ cb(idbRef); return; }
+  try {
+    var req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = function(e){
+      e.target.result.createObjectStore(DB_STORE, {keyPath:'name'});
+    };
+    req.onsuccess = function(e){
+      idbRef = e.target.result;
+      idbOK = true;
+      cb(idbRef);
+    };
+    req.onerror = function(e){
+      console.log('IndexedDB open error:', e);
+      idbOK = false;
+      cb(null);
+    };
+    req.onblocked = function(){
+      console.log('IndexedDB blocked');
+      cb(null);
+    };
+  } catch(ex) {
+    console.log('IndexedDB not available:', ex);
+    idbOK = false;
+    cb(null);
+  }
+}
+
+function saveFilesToDB(fileArray, onDone){
+  openDB(function(db){
+    if(!db){ onDone(); return; }
+    var tx    = db.transaction(DB_STORE,'readwrite');
+    var store = tx.objectStore(DB_STORE);
+    var done  = 0, total = fileArray.length;
+    if(total === 0){ onDone(); return; }
+    fileArray.forEach(function(file){
+      var fr = new FileReader();
+      fr.onload = function(e){
+        var name = file.name.replace(/\.[^.]+$/,'');
+        try{ store.put({name:name, buf:e.target.result, type:file.type||'audio/m4a'}); }catch(ex){}
+        if(++done >= total) onDone();
+      };
+      fr.onerror = function(){ if(++done >= total) onDone(); };
+      fr.readAsArrayBuffer(file);
+    });
+  });
+}
+
+function loadFilesFromDB(onLoaded){
+  openDB(function(db){
+    if(!db){ onLoaded(0); return; }
+    try{
+      var tx  = db.transaction(DB_STORE,'readonly');
+      var req = tx.objectStore(DB_STORE).getAll();
+      req.onsuccess = function(e){
+        var items = e.target.result || [];
+        items.forEach(function(item){
+          FILES[item.name] = {_buf:item.buf, _type:item.type, _fromDB:true};
+        });
+        onLoaded(items.length);
+      };
+      req.onerror = function(){ onLoaded(0); };
+    }catch(ex){ onLoaded(0); }
+  });
+}
+
+function clearDB(cb){
+  openDB(function(db){
+    if(!db){ if(cb) cb(); return; }
+    try{
+      var tx = db.transaction(DB_STORE,'readwrite');
+      tx.objectStore(DB_STORE).clear();
+      tx.oncomplete = function(){ if(cb) cb(); };
+    }catch(ex){ if(cb) cb(); }
+  });
+}
+
+function autoLoadFromDB(){
+  var msg = document.getElementById('statusMsg');
+  var ct  = document.getElementById('statusCt');
+  if(msg) msg.textContent = 'GitHubから音声を読み込み中...';
+  if(ct)  ct.textContent  = '⏳';
+
+  // GitHubAPIでファイル一覧を取得
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://api.github.com/repos/cozyiwasaki/masumi/contents/?per_page=1000&t='+Date.now(), true);
+  xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
+  xhr.responseType = 'text';
+  xhr.onload = function(){
+    if(xhr.status === 200){
+      try{
+        var files = JSON.parse(xhr.responseText);
+        var count = 0;
+        files.forEach(function(f){
+          if(f.name.match(/\.(m4a|mp3|wav|aac)$/i)){
+            var name = f.name.replace(/\.[^.]+$/, '');
+            // GitHubPagesのURLから取得するオブジェクト
+            FILES[name] = {
+              _url: 'https://cozyiwasaki.github.io/masumi/' + encodeURIComponent(f.name),
+              _rawUrl: f.download_url,
+              _fromGitHub: true,
+              _name: f.name
+            };
+            count++;
+          }
+        });
+        buildCatMap(); updateBadges();
+        var fl = document.getElementById('fileLoaded');
+        var lb = document.getElementById('loadBtn');
+        if(fl){ fl.style.display='inline'; fl.textContent='🌸 '+count+'件'; }
+        if(lb){ lb.style.display='none'; } // 不要になったので隠す
+        if(msg) msg.textContent = '読み込み済み ✓';
+        if(ct)  ct.textContent  = count+'件';
+      }catch(e){
+        console.log('GitHub API parse error:', e);
+        if(msg) msg.textContent = '音声ファイルを読み込んでください';
+        if(ct)  ct.textContent  = '0件';
+      }
+    } else {
+      // APIエラー時はIndexedDBにフォールバック
+      loadFilesFromDB(function(count){
+        if(count > 0){
+          buildCatMap(); updateBadges();
+          if(msg) msg.textContent = '読み込み済み ✓';
+          if(ct) ct.textContent = count+'件';
         } else {
-          reject(e);
+          if(msg) msg.textContent = '音声ファイルを読み込んでください';
+          if(ct) ct.textContent = '0件';
         }
       });
     }
+  };
+  xhr.onerror = function(){
+    if(msg) msg.textContent = '音声ファイルを読み込んでください';
+    if(ct) ct.textContent = '0件';
+  };
+  xhr.send();
+}
+
+// ════════════════════════════════════════════
+//  リアクションモード
+// ════════════════════════════════════════════
+var REACTIONS = [
+  // 基本あいづち
+  {ic:'😄', lb:'そうそう！'},
+  {ic:'👍', lb:'だよね'},
+  {ic:'✨', lb:'すごい！'},
+  {ic:'😂', lb:'笑える'},
+  {ic:'🤣', lb:'ばくしょう'},
+  {ic:'😆', lb:'おもしろい'},
+  {ic:'😮', lb:'えー！'},
+  {ic:'😲', lb:'びっくり'},
+  // 共感・感情
+  {ic:'😢', lb:'しくしく'},
+  {ic:'😭', lb:'泣ける'},
+  {ic:'🥺', lb:'かわいそう'},
+  {ic:'💗', lb:'わかる'},
+  {ic:'🥰', lb:'うれしい'},
+  {ic:'😊', lb:'よかった'},
+  {ic:'😍', lb:'最高！'},
+  {ic:'🤩', lb:'やばい！'},
+  // 反応
+  {ic:'👋', lb:'バイバイ'},
+  {ic:'👏', lb:'はくしゅ'},
+  {ic:'🙌', lb:'パチパチ'},
+  {ic:'🤝', lb:'よろしく'},
+  {ic:'🙏', lb:'お願い'},
+  {ic:'💪', lb:'がんばれ'},
+  {ic:'❤️', lb:'大好き'},
+  {ic:'🫂', lb:'ぎゅー'},
+  // 短い返事
+  {ic:'✅', lb:'はい'},
+  {ic:'❌', lb:'いいえ'},
+  {ic:'🤔', lb:'うーん'},
+  {ic:'😅', lb:'あはは'},
+  {ic:'😓', lb:'ちょっと…'},
+  {ic:'😑', lb:'えっと'},
+  {ic:'🤷', lb:'わからない'},
+  {ic:'👀', lb:'みてみて'},
+  // 状況
+  {ic:'🔥', lb:'盛り上がる'},
+  {ic:'💯', lb:'まんてん'},
+  {ic:'🎉', lb:'やったー'},
+  {ic:'😴', lb:'ねむい'},
+  {ic:'🤢', lb:'きもちわるい'},
+  {ic:'😤', lb:'もう！'},
+  {ic:'🫶', lb:'ありがとう'},
+  {ic:'✌️', lb:'まかせて'},
+];
+
+var rxCurBtn = null;
+var rxAudio  = null;
+
+function initReactionGrid(){
+  var grid = document.getElementById('reactionGrid');
+  if(!grid) return;
+  if(grid.children.length > 0) return; // already built
+  REACTIONS.forEach(function(rx, idx){
+    var btn = document.createElement('button');
+    btn.className = 'rx-btn';
+    btn.id = 'rx-'+idx;
+    btn.innerHTML = '<span class="rx-ic">'+rx.ic+'</span><span class="rx-lb">'+rx.lb+'</span>';
+    btn.addEventListener('click', function(){ playReaction(rx.lb, idx); });
+    grid.appendChild(btn);
   });
 }
 
-// ===== UI状態管理 =====
-function setBtnState(state){
-  const btn=document.getElementById('speak-btn');
-  const txt=document.getElementById('speak-btn-text');
-  const sp=document.getElementById('spinner');
-  const dot=document.getElementById('status-dot');
-  btn.disabled = state==='loading';
-  btn.className = 'speak-btn' + (state==='loading'?' loading':state==='success'?' success':state==='error'?' error-state':'');
-  sp.className = 'spinner' + (state==='loading'?' show':'');
-  txt.textContent = state==='loading'?'生成中...':state==='success'?'✅ 再生中':state==='error'?'❌ エラー':'🌸 話す';
-  dot.className = 'status-indicator' + (state==='loading'?' loading':state==='error'?' error':'');
+function playReaction(text, idx){
+  // 再生中なら止める
+  if(rxAudio){ try{rxAudio.stop();}catch(e){} rxAudio=null; }
+  if(rxCurBtn){ rxCurBtn.classList.remove('playing'); rxCurBtn=null; }
+
+  var btn = document.getElementById('rx-'+idx);
+  if(btn) btn.classList.add('playing');
+  rxCurBtn = btn;
+
+  unlockSession(function(){
+    ttsCall(text, 1.1, function(decoded){
+      if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+      if(actx.state==='suspended') actx.resume();
+      var gain=actx.createGain(); gain.gain.value=1.2; gain.connect(actx.destination);
+      var src=actx.createBufferSource(); src.buffer=decoded; src.connect(gain); src.start(0);
+      rxAudio = src;
+      src.onended=function(){
+        if(rxCurBtn) rxCurBtn.classList.remove('playing');
+        rxAudio=null; rxCurBtn=null;
+      };
+    }, function(){
+      if(btn) btn.classList.remove('playing');
+      rxCurBtn=null;
+    });
+  });
 }
 
-function showError(e){
-  const msg=document.getElementById('error-msg');
-  const detail=document.getElementById('error-detail');
-  const title=document.getElementById('error-title');
-  let titleText='エラーが発生しました';
-  let detailText=e?.message||'不明なエラー';
-  if(detailText.includes('タイムアウト')) titleText='⏱ タイムアウト';
-  else if(detailText.includes('429')) titleText='⚠️ 利用制限';
-  else if(detailText.includes('401')) titleText='🔑 認証エラー';
-  else if(detailText.includes('500')) titleText='🔧 サーバーエラー';
-  else if(detailText.includes('再生')) titleText='🔊 再生エラー';
-  title.textContent=titleText;
-  detail.textContent=detailText;
-  msg.classList.add('show');
-}
-function hideError(){ document.getElementById('error-msg').classList.remove('show'); }
-function showProgress(pct){
-  const bar=document.getElementById('progress-bar');
-  bar.classList.add('show');
-  document.getElementById('progress-fill').style.width=pct+'%';
-}
-function hideProgress(){
-  setTimeout(()=>{
-    document.getElementById('progress-bar').classList.remove('show');
-    document.getElementById('progress-fill').style.width='0%';
-  },500);
-}
-
-function setStatus(msg,cls=''){
-  const bar=document.getElementById('status-bar');
-  bar.textContent=msg;
-  bar.className='status-bar'+(cls?' '+cls:'');
-}
-
-// ===== 履歴 =====
-function addHistory(text){
-  history=[text,...history.filter(h=>h!==text)].slice(0,15);
-  localStorage.setItem('mk_history',JSON.stringify(history));
-  renderHistory();
-}
-function renderHistory(){
-  const el=document.getElementById('history-list');
-  if(!history.length){ el.innerHTML='<div style="color:#aaa;font-size:13px;padding:8px">まだ履歴がありません</div>'; return; }
-  el.innerHTML=history.map(h=>`<div class="history-item" onclick="doSpeak('${h.replace(/'/g,"\\'")}')">${h}<span style="color:#aaa;margin-left:8px">🔊</span></div>`).join('');
-}
-
-// ===== UI =====
-function updateCount(){ document.getElementById('char-count').textContent=document.getElementById('tts-input').value.length; }
-function updateSpeed(){
-  speechRate=parseFloat(document.getElementById('speed-slider').value);
-  const labels={0.5:'ゆっくり (0.5×)',0.75:'少しゆっくり',1.0:'標準 (1.0×)',1.25:'少し速め',1.5:'速め (1.5×)',2.0:'とても速い'};
-  document.getElementById('speed-val').textContent=labels[speechRate]||`${speechRate}×`;
-}
-function showTab(name,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  el.classList.add('active');
-}
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
-}
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-// ===== 筆談ボード =====
-function initCanvas(){
-  const canvas=document.getElementById('canvas');
-  canvas.width=canvas.parentElement.offsetWidth||340;
-  canvas.height=280;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
-  let drawing=false,color='#333',size=6;
-  window.setColor=el=>{color=el.dataset.color;document.querySelectorAll('.wb-color').forEach(e=>e.classList.remove('active'));el.classList.add('active')};
-  window.setSize=el=>{size=parseInt(el.dataset.size);document.querySelectorAll('.wb-size').forEach(e=>e.classList.remove('active'));el.classList.add('active')};
-  window.clearCanvas=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height)};
-  const pos=e=>{const r=canvas.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(canvas.width/r.width),y:(s.clientY-r.top)*(canvas.height/r.height)}};
-  canvas.addEventListener('mousedown',e=>{drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});
-  canvas.addEventListener('mousemove',e=>{if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle=color;ctx.lineWidth=size;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke()});
-  canvas.addEventListener('mouseup',()=>drawing=false);
-  canvas.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y)},{passive:false});
-  canvas.addEventListener('touchmove',e=>{if(!drawing)return;e.preventDefault();const p=pos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle=color;ctx.lineWidth=size;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke()},{passive:false});
-  canvas.addEventListener('touchend',()=>drawing=false);
-}
-
-init();
 </script>
 </body>
 </html>
