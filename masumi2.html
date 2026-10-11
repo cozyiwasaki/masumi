@@ -158,7 +158,7 @@ body{font-family:-apple-system,"Hiragino Sans",sans-serif;background:#FFF5F3;col
 <input type="file" id="fileInput" multiple style="display:none">
 <div id="topbar">
   <button id="backBtn" onclick="goBack()">◀ もどる</button>
-  <span id="appTitle">ますみのこえ 🌸</span>
+  <span id="appTitle" onclick="titleTap()">ますみのこえ 🌸</span>
   <div id="topRight">
     <span id="fileLoaded" style="font-size:12px;color:#AA7070;display:none;"></span>
     <button id="loadBtn" onclick="triggerFile()">📂 音声読込</button>
@@ -244,7 +244,19 @@ body{font-family:-apple-system,"Hiragino Sans",sans-serif;background:#FFF5F3;col
   <button id="hdEraserBtn" onclick="hdToggleEraser()">消しゴム</button>
 </div>
 <script>
-var TTS_API='sk_f623a27ecd3c189e2dec9ee82f806f0e52b6ab4b00ebadf5';
+// APIキーは公開GitHubに置かず、この端末だけに保存する（漏えい・自動停止を防ぐ）
+var TTS_KEY_LS='masumi_el_key';
+var TTS_API='';try{TTS_API=localStorage.getItem(TTS_KEY_LS)||'';}catch(e){}
+var askingKey=false,tapN=0,tapT=0;
+function titleTap(){var n=Date.now();tapN=(n-tapT<600)?tapN+1:1;tapT=n;if(tapN>=3){tapN=0;askApiKey('キーを入れ直します。\n');}}
+// キーを入力してもらい端末に保存。リトライ中に何度も聞かないようにガードする
+function askApiKey(msg){
+  if(askingKey)return false;askingKey=true;
+  var k=window.prompt((msg||'')+'ElevenLabsのAPIキー（sk_…）を貼り付けてください','');
+  askingKey=false;
+  if(k&&k.trim()){TTS_API=k.trim();try{localStorage.setItem(TTS_KEY_LS,TTS_API);}catch(e){}return true;}
+  return false;
+}
 var TTS_VID='WTQPCUFYlENCEyXVl4PU';
 var BUILTIN={
   kihon:['ありがとう','どういたしまして','ごめんなさい','すみません','はい','いいえ','おねがいします','よろしくお願いします','わかりました','わかりません','もう一度お願いします','ゆっくり話してください','助けてください','大丈夫です','順調です'],
@@ -388,6 +400,7 @@ function ttsCallOnce(text,speed,onSuccess,onError){
   var ctx=getActx();
   var xhr=new XMLHttpRequest();
   xhr.open('POST','https://api.elevenlabs.io/v1/text-to-speech/'+TTS_VID,true);
+  if(!TTS_API&&!askApiKey('')){if(onError)onError('nokey');return;}
   xhr.setRequestHeader('Content-Type','application/json');xhr.setRequestHeader('xi-api-key',TTS_API);
   xhr.responseType='arraybuffer';
   xhr.timeout=20000;
@@ -396,7 +409,7 @@ function ttsCallOnce(text,speed,onSuccess,onError){
       ensureActxRunning(function(c){
         c.decodeAudioData(xhr.response.slice(0),function(decoded){onSuccess(decoded);},function(e){if(onError)onError('decode');});
       });
-    }else{if(onError)onError('HTTP_'+xhr.status);}
+    }else{if(xhr.status===401){TTS_API='';try{localStorage.removeItem(TTS_KEY_LS);}catch(e){}askApiKey('キーが無効です。\n');}if(onError)onError('HTTP_'+xhr.status);}
   };
   xhr.onerror=function(){if(onError)onError('network');};
   xhr.ontimeout=function(){if(onError)onError('timeout');};
